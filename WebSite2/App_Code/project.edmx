@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BusDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityType Name="Bus">
+          <Key>
+            <PropertyRef Name="BusNo" />
+          </Key>
+          <Property Name="BusNo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BusName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Time" Type="time" Precision="7" Nullable="false" />
+          <Property Name="Seats" Type="int" Nullable="false" />
+          <Property Name="Fare" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'C:\USERS\LENOVO\DESKTOP\DBMS_PROJECT\WEBSITE2\APP_DATA\BUSDATABASE.MDF.dbo.Destination' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Destination">
+          <Key>
+            <PropertyRef Name="Dest" />
+            <PropertyRef Name="BusNo" />
+            <PropertyRef Name="Days" />
+          </Key>
+          <Property Name="Dest" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="BusNo" Type="int" Nullable="false" />
+          <Property Name="Days" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Passenger">
+          <Key>
+            <PropertyRef Name="BookID" />
+          </Key>
+          <Property Name="BookID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BusNo" Type="int" Nullable="false" />
+          <Property Name="PassName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Seats" Type="int" Nullable="false" />
+          <Property Name="DOJ" Type="date" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Destination_Bus(BusNo)">
+          <End Role="Bus" Type="Self.Bus" Multiplicity="1" />
+          <End Role="Destination" Type="Self.Destination" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Bus">
+              <PropertyRef Name="BusNo" />
+            </Principal>
+            <Dependent Role="Destination">
+              <PropertyRef Name="BusNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Passenger_BusNo(BusNo)">
+          <End Role="Bus" Type="Self.Bus" Multiplicity="1" />
+          <End Role="Passenger" Type="Self.Passenger" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Bus">
+              <PropertyRef Name="BusNo" />
+            </Principal>
+            <Dependent Role="Passenger">
+              <PropertyRef Name="BusNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="BusDatabaseModelStoreContainer">
+          <EntitySet Name="Bus" EntityType="Self.Bus" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Passenger" EntityType="Self.Passenger" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Destination" EntityType="Self.Destination" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[Destination].[Dest] AS [Dest], 
+[Destination].[BusNo] AS [BusNo], 
+[Destination].[Days] AS [Days]
+FROM [dbo].[Destination] AS [Destination]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Destination_Bus(BusNo)" Association="Self.FK_Destination_Bus(BusNo)">
+            <End Role="Bus" EntitySet="Bus" />
+            <End Role="Destination" EntitySet="Destination" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Passenger_BusNo(BusNo)" Association="Self.FK_Passenger_BusNo(BusNo)">
+            <End Role="Bus" EntitySet="Bus" />
+            <End Role="Passenger" EntitySet="Passenger" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BusDatabaseModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityType Name="Bus">
+          <Key>
+            <PropertyRef Name="BusNo" />
+          </Key>
+          <Property Name="BusNo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BusName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Time" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="Seats" Type="Int32" Nullable="false" />
+          <Property Name="Fare" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Destinations" Relationship="Self.FK_Destination_Bus_BusNo_" FromRole="Bus" ToRole="Destination" />
+          <NavigationProperty Name="Passengers" Relationship="Self.FK_Passenger_BusNo_BusNo_" FromRole="Bus" ToRole="Passenger" />
+        </EntityType>
+        <EntityType Name="Passenger">
+          <Key>
+            <PropertyRef Name="BookID" />
+          </Key>
+          <Property Name="BookID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PassName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Seats" Type="Int32" Nullable="false" />
+          <Property Name="DOJ" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="Bus" Relationship="Self.FK_Passenger_BusNo_BusNo_" FromRole="Passenger" ToRole="Bus" />
+        </EntityType>
+        <EntityType Name="Destination">
+          <Key>
+            <PropertyRef Name="Dest" />
+            <PropertyRef Name="BusNo" />
+            <PropertyRef Name="Days" />
+          </Key>
+          <Property Name="Dest" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="BusNo" Type="Int32" Nullable="false" />
+          <Property Name="Days" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Bus" Relationship="Self.FK_Destination_Bus_BusNo_" FromRole="Destination" ToRole="Bus" />
+        </EntityType>
+        <Association Name="FK_Destination_Bus_BusNo_">
+          <End Role="Bus" Type="Self.Bus" Multiplicity="1" />
+          <End Role="Destination" Type="Self.Destination" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Bus">
+              <PropertyRef Name="BusNo" />
+            </Principal>
+            <Dependent Role="Destination">
+              <PropertyRef Name="BusNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Passenger_BusNo_BusNo_">
+          <End Role="Bus" Type="Self.Bus" Multiplicity="1" />
+          <End Role="Passenger" Type="Self.Passenger" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="BusDatabaseEntities">
+          <EntitySet Name="Buses" EntityType="Self.Bus" />
+          <EntitySet Name="Passengers" EntityType="Self.Passenger" />
+          <EntitySet Name="Destinations" EntityType="Self.Destination" />
+          <AssociationSet Name="FK_Destination_Bus_BusNo_" Association="Self.FK_Destination_Bus_BusNo_">
+            <End Role="Bus" EntitySet="Buses" />
+            <End Role="Destination" EntitySet="Destinations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Passenger_BusNo_BusNo_" Association="Self.FK_Passenger_BusNo_BusNo_">
+            <End Role="Bus" EntitySet="Buses" />
+            <End Role="Passenger" EntitySet="Passengers" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="BusDatabaseModelStoreContainer" CdmEntityContainer="BusDatabaseEntities">
+          <EntitySetMapping Name="Buses">
+            <EntityTypeMapping TypeName="BusDatabaseModel.Bus">
+              <MappingFragment StoreEntitySet="Bus">
+                <ScalarProperty Name="BusNo" ColumnName="BusNo" />
+                <ScalarProperty Name="BusName" ColumnName="BusName" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="Seats" ColumnName="Seats" />
+                <ScalarProperty Name="Fare" ColumnName="Fare" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Passengers">
+            <EntityTypeMapping TypeName="BusDatabaseModel.Passenger">
+              <MappingFragment StoreEntitySet="Passenger">
+                <ScalarProperty Name="BookID" ColumnName="BookID" />
+                <ScalarProperty Name="PassName" ColumnName="PassName" />
+                <ScalarProperty Name="Seats" ColumnName="Seats" />
+                <ScalarProperty Name="DOJ" ColumnName="DOJ" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Destinations">
+            <EntityTypeMapping TypeName="BusDatabaseModel.Destination">
+              <MappingFragment StoreEntitySet="Destination">
+                <ScalarProperty Name="Dest" ColumnName="Dest" />
+                <ScalarProperty Name="BusNo" ColumnName="BusNo" />
+                <ScalarProperty Name="Days" ColumnName="Days" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_Destination_Bus_BusNo_" TypeName="BusDatabaseModel.FK_Destination_Bus_BusNo_" StoreEntitySet="Destination">
+            <EndProperty Name="Bus">
+              <ScalarProperty Name="BusNo" ColumnName="BusNo" />
+            </EndProperty>
+            <EndProperty Name="Destination">
+              <ScalarProperty Name="Dest" ColumnName="Dest" />
+              <ScalarProperty Name="BusNo" ColumnName="BusNo" />
+              <ScalarProperty Name="Days" ColumnName="Days" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_Passenger_BusNo_BusNo_" TypeName="BusDatabaseModel.FK_Passenger_BusNo_BusNo_" StoreEntitySet="Passenger">
+            <EndProperty Name="Bus">
+              <ScalarProperty Name="BusNo" ColumnName="BusNo" />
+            </EndProperty>
+            <EndProperty Name="Passenger">
+              <ScalarProperty Name="BookID" ColumnName="BookID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
